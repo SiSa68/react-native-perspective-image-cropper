@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -40,6 +41,10 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.lang.Integer;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 public class RNCustomCropModule extends ReactContextBaseJavaModule {
 
@@ -63,8 +68,14 @@ public class RNCustomCropModule extends ReactContextBaseJavaModule {
     Point bl = new Point(points.getMap("bottomLeft").getDouble("x"), points.getMap("bottomLeft").getDouble("y"));
     Point br = new Point(points.getMap("bottomRight").getDouble("x"), points.getMap("bottomRight").getDouble("y"));
 
-    Mat src = Imgcodecs.imread(imageUri.replace("file://", ""), Imgproc.COLOR_BGR2RGB);
+    Bitmap bmp = BitmapFactory.decodeFile(imageUri.replace("file://", ""));
+    /* Mat src = Imgcodecs.imread(imageUri.replace("file://", ""), Imgproc.COLOR_BGR2RGB);
+    Log.i("ReactNative", Integer.toString(src.channels())); */
+    Mat src = new Mat (bmp.getWidth(), bmp.getHeight(), CvType.CV_8UC1);
+    Bitmap bmp32 = bmp.copy(Bitmap.Config.ARGB_8888, true);
+    Utils.bitmapToMat(bmp32, src);
     Imgproc.cvtColor(src, src, Imgproc.COLOR_BGR2RGB);
+    Imgproc.resize(src, src, new Size(points.getDouble("width"), points.getDouble("height")));
 
     boolean ratioAlreadyApplied = tr.x * (src.size().width / 500) < src.size().width;
     double ratio = ratioAlreadyApplied ? src.size().width / 500 : 1;
@@ -72,13 +83,13 @@ public class RNCustomCropModule extends ReactContextBaseJavaModule {
     double widthA = Math.sqrt(Math.pow(br.x - bl.x, 2) + Math.pow(br.y - bl.y, 2));
     double widthB = Math.sqrt(Math.pow(tr.x - tl.x, 2) + Math.pow(tr.y - tl.y, 2));
 
-    double dw = Math.max(widthA, widthB) * ratio;
+    double dw = Math.max(widthA, widthB);
     int maxWidth = Double.valueOf(dw).intValue();
 
     double heightA = Math.sqrt(Math.pow(tr.x - br.x, 2) + Math.pow(tr.y - br.y, 2));
     double heightB = Math.sqrt(Math.pow(tl.x - bl.x, 2) + Math.pow(tl.y - bl.y, 2));
 
-    double dh = Math.max(heightA, heightB) * ratio;
+    double dh = Math.max(heightA, heightB);
     int maxHeight = Double.valueOf(dh).intValue();
 
     Mat doc = new Mat(maxHeight, maxWidth, CvType.CV_8UC4);
@@ -86,8 +97,7 @@ public class RNCustomCropModule extends ReactContextBaseJavaModule {
     Mat src_mat = new Mat(4, 1, CvType.CV_32FC2);
     Mat dst_mat = new Mat(4, 1, CvType.CV_32FC2);
 
-    src_mat.put(0, 0, tl.x * ratio, tl.y * ratio, tr.x * ratio, tr.y * ratio, br.x * ratio, br.y * ratio, bl.x * ratio,
-        bl.y * ratio);
+    src_mat.put(0, 0, tl.x, tl.y, tr.x, tr.y, br.x, br.y, bl.x, bl.y);
     dst_mat.put(0, 0, 0.0, 0.0, dw, 0.0, dw, dh, 0.0, dh);
 
     Mat m = Imgproc.getPerspectiveTransform(src_mat, dst_mat);
