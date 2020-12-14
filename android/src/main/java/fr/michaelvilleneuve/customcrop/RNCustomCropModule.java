@@ -34,6 +34,8 @@ import org.opencv.calib3d.Calib3d;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,8 +47,10 @@ import java.lang.Integer;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import java.util.UUID;
 
 public class RNCustomCropModule extends ReactContextBaseJavaModule {
+  private static final String TAG = "RNCustomCropModule";
 
   private final ReactApplicationContext reactContext;
 
@@ -107,12 +111,33 @@ public class RNCustomCropModule extends ReactContextBaseJavaModule {
     Bitmap bitmap = Bitmap.createBitmap(doc.cols(), doc.rows(), Bitmap.Config.ARGB_8888);
     Utils.matToBitmap(doc, bitmap);
 
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
-    byte[] byteArray = byteArrayOutputStream.toByteArray();
+    String fileName;
+    String folderName = "croped";
+    String folderDir = this.reactContext.getCacheDir().toString();
+    File folder = new File(folderDir + "/" + folderName);
+    if (!folder.exists()) {
+        boolean result = folder.mkdirs();
+        if (result) Log.d(TAG, "wrote: created folder " + folder.getPath());
+        else Log.d(TAG, "Not possible to create folder"); // TODO: Manage this error better
+    }
+    fileName = folderDir + "/" + folderName + "/" + UUID.randomUUID()
+                + ".jpg";
+
+    File file = new File(fileName);
+    try (FileOutputStream out = new FileOutputStream(file)) {
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    // ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    // bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
+    // byte[] byteArray = byteArrayOutputStream.toByteArray();
 
     WritableMap map = Arguments.createMap();
-    map.putString("image", Base64.encodeToString(byteArray, Base64.DEFAULT));
+    // map.putString("image", Base64.encodeToString(byteArray, Base64.DEFAULT));
+    if(!fileName.startsWith("file://")) fileName = "file://" + fileName;
+    map.putString("image", fileName);
     callback.invoke(null, map);
 
     m.release();

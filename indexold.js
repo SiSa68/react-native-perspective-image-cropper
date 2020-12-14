@@ -5,6 +5,7 @@ import {
     Dimensions,
     Image,
     View,
+    ScrollView,
     Animated,
 } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg';
@@ -168,8 +169,8 @@ class CustomCrop extends Component {
                     justifyContent: 'flex-end',
                 }}
             >
-                <View
-                    style={[
+                <ScrollView
+                    contentContainerStyle={[
                         s(this.props).cropContainer,
                         { height: this.state.viewHeight },
                     ]}
@@ -276,7 +277,7 @@ class CustomCrop extends Component {
                             ]}
                         />
                     </Animated.View>
-                </View>
+                </ScrollView>
             </View>
         );
     }
@@ -298,7 +299,7 @@ const s = (props) => ({
     },
     image: {
         width: WINDOWS_WIDTH,
-        position: 'absolute',
+        // position: 'absolute',
     },
     bottomButton: {
         alignItems: 'center',
@@ -319,8 +320,8 @@ const s = (props) => ({
         position: 'absolute',
     },
     cropContainer: {
-        position: 'absolute',
-        left: HORIZONTAL_PADDING,
+        // position: 'absolute',
+        // left: HORIZONTAL_PADDING,
         width: WINDOWS_WIDTH,
         top: 0,
     },

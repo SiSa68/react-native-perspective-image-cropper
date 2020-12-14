@@ -36,8 +36,14 @@ RCT_EXPORT_METHOD(crop:(NSDictionary *)points imageUri:(NSString *)imageUri call
     CGImageRef cgimage = [context createCGImage:ciImage fromRect:[ciImage extent]];
     UIImage *image = [UIImage imageWithCGImage:cgimage];
     
-    NSData *imageToEncode = UIImageJPEGRepresentation(image, 0.8);
-    callback(@[[NSNull null], @{@"image": [imageToEncode base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength]}]);
+    // NSData *imageToEncode = UIImageJPEGRepresentation(image, 0.8);
+    // callback(@[[NSNull null], @{@"image": [imageToEncode base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength]}]);
+
+    NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
+    NSString *dir = NSTemporaryDirectory();
+    NSString *imageFilePath = [dir stringByAppendingPathComponent:[NSString stringWithFormat:@"cropped_img_%i.jpeg",(int)[NSDate date].timeIntervalSince1970]];
+    [imageData writeToFile:imageFilePath atomically:YES];
+    callback(@[[NSNull null], @{@"image": imageFilePath}]);
 }
 
 - (CGPoint)cartesianForPoint:(CGPoint)point height:(float)height {
