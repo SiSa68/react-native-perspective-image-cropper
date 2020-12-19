@@ -88,6 +88,12 @@ class CustomCrop extends Component {
         );
     }
 
+    toggleMoving = () => {
+        this.setState({
+            moving: !this.state.moving
+        });
+    }
+
     createPanResponser(corner) {
         return PanResponder.create({
             onStartShouldSetPanResponder: () => true,
@@ -101,10 +107,12 @@ class CustomCrop extends Component {
             onPanResponderRelease: () => {
                 corner.flattenOffset();
                 this.updateOverlayString();
+                this.toggleMoving();
             },
             onPanResponderGrant: () => {
                 corner.setOffset({ x: corner.x._value, y: corner.y._value });
                 corner.setValue({ x: 0, y: 0 });
+                this.toggleMoving();
             },
         });
     }
@@ -170,6 +178,7 @@ class CustomCrop extends Component {
                 }}
             >
                 <ScrollView
+                    canCancelContentTouches={!this.state.moving}
                     contentContainerStyle={[
                         s(this.props).cropContainer,
                         { height: this.state.viewHeight },
