@@ -96,7 +96,15 @@ class CustomCrop extends Component {
 
     createPanResponser(corner) {
         return PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
+            onStartShouldSetPanResponder: (evt) => 
+                evt.target === this.tlRe ||
+                evt.target === this.tlRo ||
+                evt.target === this.trRe ||
+                evt.target === this.trRo ||
+                evt.target === this.blRe ||
+                evt.target === this.blRo ||
+                evt.target === this.brRe ||
+                evt.target === this.brRo,
             onPanResponderMove: Animated.event([
                 null,
                 {
@@ -214,12 +222,14 @@ class CustomCrop extends Component {
                         ]}
                     >
                         <View
+                            ref={r => this.tlRe = r}
                             style={[
                                 s(this.props).handlerI,
                                 { left: -10, top: -10 },
                             ]}
                         />
                         <View
+                            ref={r => this.tlRo = r}
                             style={[
                                 s(this.props).handlerRound,
                                 { left: 31, top: 31 },
@@ -234,12 +244,14 @@ class CustomCrop extends Component {
                         ]}
                     >
                         <View
+                            ref={r => this.trRe = r}
                             style={[
                                 s(this.props).handlerI,
                                 { left: 10, top: -10 },
                             ]}
                         />
                         <View
+                            ref={r => this.trRo = r}
                             style={[
                                 s(this.props).handlerRound,
                                 { right: 31, top: 31 },
@@ -254,12 +266,14 @@ class CustomCrop extends Component {
                         ]}
                     >
                         <View
+                            ref={r => this.blRe = r}
                             style={[
                                 s(this.props).handlerI,
                                 { left: -10, top: 10 },
                             ]}
                         />
                         <View
+                            ref={r => this.blRo = r}
                             style={[
                                 s(this.props).handlerRound,
                                 { left: 31, bottom: 31 },
@@ -274,12 +288,14 @@ class CustomCrop extends Component {
                         ]}
                     >
                         <View
+                            ref={r => this.brRe = r}
                             style={[
                                 s(this.props).handlerI,
                                 { left: 10, top: 10 },
                             ]}
                         />
                         <View
+                            ref={r => this.brRo = r}
                             style={[
                                 s(this.props).handlerRound,
                                 { right: 31, bottom: 31 },
