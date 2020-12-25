@@ -88,9 +88,9 @@ class CustomCrop extends Component {
         );
     }
 
-    toggleMoving = () => {
+    setMoving = (moving) => {
         this.setState({
-            moving: !this.state.moving
+            moving
         });
     }
 
@@ -111,16 +111,22 @@ class CustomCrop extends Component {
                     dx: corner.x,
                     dy: corner.y,
                 },
-            ]),
-            onPanResponderRelease: () => {
+            ], {
+                useNativeDriver: false,
+            }),
+            onPanResponderEnd: () => {
                 corner.flattenOffset();
                 this.updateOverlayString();
-                this.toggleMoving();
+                this.setMoving(false);
             },
             onPanResponderGrant: () => {
+                if(this.state.moving) {
+                    corner.flattenOffset();
+                    this.updateOverlayString();
+                }
+                this.setMoving(true);
                 corner.setOffset({ x: corner.x._value, y: corner.y._value });
                 corner.setValue({ x: 0, y: 0 });
-                this.toggleMoving();
             },
         });
     }
