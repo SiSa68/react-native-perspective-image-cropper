@@ -114,7 +114,12 @@ class CustomCrop extends Component {
             ], {
                 useNativeDriver: false,
             }),
-            onPanResponderEnd: () => {
+            onPanResponderRelease: () => {
+                corner.flattenOffset();
+                this.updateOverlayString();
+                this.setMoving(false);
+            },
+            onPanResponderTerminate: () => {
                 corner.flattenOffset();
                 this.updateOverlayString();
                 this.setMoving(false);
