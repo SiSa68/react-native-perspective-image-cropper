@@ -215,6 +215,15 @@ class CustomCrop extends Component {
 
     onRootViewLayout = (event) => {
         const rootSize = event.nativeEvent.layout;
+        if (
+          !rootSize ||
+          !rootSize.width ||
+          !rootSize.height ||
+          rootSize.width <= 0 ||
+          rootSize.height <= 0
+        )
+          return;
+
         let viewHeight = rootSize.height - 
                             ZOOM_BOX.height - ZOOM_BOX.verticalMargin * 2 - 
                             BOTTOM_MARGIN;
